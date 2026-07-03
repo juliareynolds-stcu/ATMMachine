@@ -1,6 +1,6 @@
 ﻿namespace ATMMachineTests;
 
-using static ATMMachine.Logic;
+using ATMMachine;
 
 public class LogicTests
 {

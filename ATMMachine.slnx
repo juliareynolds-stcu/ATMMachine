@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="ATMMachine/ATMMachine.csproj" />
+  <Project Path="ATMMachineTests/ATMMachineTests.csproj" />
+</Solution>

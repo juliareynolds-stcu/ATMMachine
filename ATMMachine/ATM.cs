@@ -32,9 +32,35 @@ public class ATM
     /// <summary>
     /// Constructor that initializes the starting state of the ATM
     /// </summary>
-    public ATM()
+    public ATM() : this(1) {}
+
+    /// <summary>
+    /// Constructor that initializes the starting state of the ATM based on caller option.
+    /// 0 - empty ATM,
+    /// 1 - standard ATM,
+    /// 2 - max ATM,
+    /// Defaults to standard ATM on invalid input
+    /// </summary>
+    public ATM(int option)
     {
         InitATMCurency();
+
+        if (option == 0)
+        {
+            foreach (var value in this.availableCurrency!.Keys)
+            {
+                this.availableCurrency[value] = 0;
+            }
+        }
+
+        if (option == 2)
+        {
+            foreach (var value in this.availableCurrency!.Keys)
+            {
+                this.availableCurrency[value] = int.MaxValue;
+            }
+        }
+
     }
 
     /// <summary>

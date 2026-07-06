@@ -13,6 +13,33 @@ public class LogicTests
     }
 
     [Test]
+    public void SetsUpCallerDesiredATMType()
+    {
+        // Arrange
+        ATM sut = new(0);
+        ATM sut2 = new(2);
+
+        // Act
+        var empty = sut.GetCurrentState();
+        var max = sut2.GetCurrentState();
+
+        // Assert
+        empty.Should().NotBeNull();
+
+        foreach (var value in empty.Keys)
+        {
+            empty[value].Should().Be(0);
+        }
+
+        max.Should().NotBeNull();
+
+        foreach (var value in max.Keys)
+        {
+            max[value].Should().Be(int.MaxValue);
+        }
+    }
+
+    [Test]
     public void ReturnsNoneWhenGettingInvalidCurrency()
     {
         // Arrange

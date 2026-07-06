@@ -47,12 +47,15 @@ public class LogicTests
         ATM sut = new();
 
         // Act
-        Dictionary<int, int> result = sut.Withdraw(434);
+        Dictionary<int, int>? result = sut.Withdraw(434);
         int sum = 0;
 
-        foreach (var value in result.Keys)
+        if (result is not null)
         {
-            sum += (value * result[value]);
+            foreach (var value in result.Keys)
+            {
+                sum += (value * result[value]);
+            }
         }
 
         // Assert

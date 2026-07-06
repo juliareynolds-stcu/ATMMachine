@@ -75,6 +75,15 @@ public class ATM
     }
 
     /// <summary>
+    /// Returns the current state of the ATM - the number of each value of currency currently in the ATM.
+    /// </summary>
+    /// <returns>Available currency in the form of a dictionary</returns>
+    public Dictionary<int, int> GetCurrentState()
+    {
+        return new(this.availableCurrency);
+    }
+
+    /// <summary>
     /// Returns if the currency value is a bill or coin.
     /// </summary>
     /// <param name="currencyValue">The value of the bill/coin</param>
@@ -103,6 +112,27 @@ public class ATM
     }
 
     /// <summary>
+    /// Returns the amount of the specified currency value remaining in the ATM
+    /// </summary>
+    /// <param name="currencyValue">The value of the bill/coin</param>
+    /// <returns>The number of that bill/coin in the ATM</returns>
+    public int GetAvailable(int currencyValue)
+    {
+        var result = -1;
+
+        try
+        {
+            result = this.availableCurrency[currencyValue];
+        }
+        catch
+        {
+            return result;
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Determines the amount of each value of currency to withdraw.
     /// </summary>
     /// <param name="quantity">Desired total to withdraw</param>
@@ -119,6 +149,7 @@ public class ATM
 
         // work from largest to smallest, adding to result until = quantity
         var remainder = quantity;
+        Dictionary<int, int> remainingCurrency = GetCurrentState();
         Dictionary<int, int> result = new();
 
         for (int currencyIdx = currencyValues.Count - 1; currencyIdx >= 0; currencyIdx--)
@@ -126,10 +157,12 @@ public class ATM
             var value = currencyValues[currencyIdx];
             var totalGiven = 0;
 
-            while (value <= remainder)
+            while (value <= remainder && remainingCurrency[value] > 0)
             {
                 remainder -= value;
                 totalGiven += 1;
+
+                remainingCurrency[value] -= 1;
             }
 
             if (totalGiven > 0)
@@ -143,6 +176,9 @@ public class ATM
         {
             return null;
         }
+
+        // if quantity met, update avaiable cash
+        this.availableCurrency = remainingCurrency;
 
         return result;
     }

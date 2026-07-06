@@ -166,7 +166,7 @@ public class LogicTests
         ATM sut = new();
 
         // Act
-        sut.Withdraw(5100);
+        sut.Withdraw(5101);
 
         Dictionary<int, int>? result = sut.GetCurrentState();
 

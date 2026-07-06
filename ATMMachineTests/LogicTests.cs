@@ -158,4 +158,28 @@ public class LogicTests
         sut.GetCurrentState()[1].Should().Be(499);
         sut.GetAvailable(1).Should().Be(499);
     }
+
+    [Test]
+    public void DoesntRemoveCashFromATMIfUnableToCompleteTransaction()
+    {
+        // Arrange
+        ATM sut = new();
+
+        // Act
+        sut.Withdraw(5100);
+
+        Dictionary<int, int>? result = sut.GetCurrentState();
+
+        // Assert
+        result.Should().NotBeNull();
+        result[500].Should().Be(2);
+        result[200].Should().Be(3);
+        result[100].Should().Be(5);
+        result[50].Should().Be(12);
+        result[20].Should().Be(20);
+        result[10].Should().Be(50);
+        result[5].Should().Be(100);
+        result[2].Should().Be(250);
+        result[1].Should().Be(500);
+    }
 }

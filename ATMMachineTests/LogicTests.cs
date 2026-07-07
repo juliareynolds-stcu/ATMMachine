@@ -40,7 +40,7 @@ public class LogicTests
     }
 
     [Test]
-    public void ReturnsNoneWhenGettingInvalidCurrency()
+    public void ReturnsNullWhenGettingInvalidCurrency()
     {
         // Arrange
         ATM sut = new();
@@ -49,7 +49,7 @@ public class LogicTests
         var currencyType = sut.GetCurrencyType(-1);
 
         // Assert
-        currencyType.Should().Be("none");
+        currencyType.Should().BeNull();
     }
 
     [Test]
@@ -74,7 +74,7 @@ public class LogicTests
         ATM sut = new();
 
         // Act
-        var available = sut.GetAvailable(-5);
+        var available = sut.GetQuantityAvailable(-5);
 
         // Assert
         available.Should().BeLessThan(0);
@@ -87,7 +87,7 @@ public class LogicTests
         ATM sut = new();
 
         // Act
-        var available = sut.GetAvailable(500);
+        var available = sut.GetQuantityAvailable(500);
 
         // Assert
         available.Should().Be(2);
@@ -183,7 +183,7 @@ public class LogicTests
 
         // Assert
         sut.GetCurrentState()[1].Should().Be(499);
-        sut.GetAvailable(1).Should().Be(499);
+        sut.GetQuantityAvailable(1).Should().Be(499);
     }
 
     [Test]
@@ -208,5 +208,62 @@ public class LogicTests
         result[5].Should().Be(100);
         result[2].Should().Be(250);
         result[1].Should().Be(500);
+    }
+
+    [Test]
+    public void SimpleDepositsWork()
+    {
+        // Arrange
+        ATM sut = new(0);
+
+        // Act
+        bool result = sut.Deposit(1, 1);
+
+        // Assert
+        result.Should().BeTrue();
+        sut.GetQuantityAvailable(1).Should().Be(1);
+    }
+
+    [Test]
+    public void ReturnsFalseOnInvalidInput()
+    {
+        // Arrange
+        ATM sut = new(0);
+
+        // Act
+        bool result = sut.Deposit(-1, 1);
+        bool result2 = sut.Deposit(1, -1);
+        bool result3 = sut.Deposit(int.MaxValue, 1);
+
+        sut.Deposit(1, 1);
+
+        bool result4 = sut.Deposit(1, int.MaxValue);
+
+        // Assert
+        result.Should().BeFalse();
+        result2.Should().BeFalse();
+        result3.Should().BeFalse();
+        result4.Should().BeFalse();
+
+        sut.GetQuantityAvailable(1).Should().Be(1);
+    }
+
+    [Test]
+    public void AccuratelyReturnsTotalValueInATM()
+    {
+        // Arrange
+        ATM sut = new();
+        ATM sut2 = new(0);
+        ATM sut3 = new(2);
+
+        // Act
+        int result = sut.GetTotalAvailable();
+        int result2 = sut2.GetTotalAvailable();
+        int result3 = sut3.GetTotalAvailable();
+
+        // Assert
+        result.Should().Be(5100);
+        result2.Should().Be(0);
+        result3.Should().Be(int.MaxValue);
     }
 }

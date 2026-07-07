@@ -209,4 +209,42 @@ public class LogicTests
         result[2].Should().Be(250);
         result[1].Should().Be(500);
     }
+
+    [Test]
+    public void SimpleDepositsWork()
+    {
+        // Arrange
+        ATM sut = new(0);
+
+        // Act
+        bool result = sut.Deposit(1, 1);
+
+        // Assert
+        result.Should().BeTrue();
+        sut.GetAvailable(1).Should().Be(1);
+    }
+
+    [Test]
+    public void ReturnsFalseOnInvalidInput()
+    {
+        // Arrange
+        ATM sut = new(0);
+
+        // Act
+        bool result = sut.Deposit(-1, 1);
+        bool result2 = sut.Deposit(1, -1);
+        bool result3 = sut.Deposit(int.MaxValue, 1);
+
+        sut.Deposit(1, 1);
+
+        bool result4 = sut.Deposit(1, int.MaxValue);
+
+        // Assert
+        result.Should().BeFalse();
+        result2.Should().BeFalse();
+        result3.Should().BeFalse();
+        result4.Should().BeFalse();
+
+        sut.GetAvailable(1).Should().Be(1);
+    }
 }

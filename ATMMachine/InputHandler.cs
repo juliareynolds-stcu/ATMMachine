@@ -12,6 +12,7 @@ internal class InputHandler
     {
         ATMCLI.WithdrawSelected += WithdrawHandled;
         ATMCLI.ViewCurrentStateSelected += ViewCurrentStateHandled;
+        ATMCLI.DepositSelected += DepositHandled;
 
         this.atm = new();
     }
@@ -83,5 +84,52 @@ internal class InputHandler
         }
 
         Console.WriteLine($"\r\nMax Withdrawl Amount:  {total}\r\n");
+    }
+
+    private void DepositHandled()
+    {
+        Console.WriteLine();
+        Console.WriteLine("What value of currency would you like to deposit?");
+        Console.Write(">  ");
+
+        int depositValue = -1;
+
+        try
+        {
+            depositValue = int.Parse(Console.ReadLine());
+        }
+        catch
+        {
+            Console.WriteLine("Invalid input. Please enter an integer > 0");
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("How many would you like to deposit?");
+        Console.Write(">  ");
+
+        int depositAmt = -1;
+
+        try
+        {
+            depositAmt = int.Parse(Console.ReadLine());
+        }
+        catch
+        {
+            Console.WriteLine("Invalid input. Please enter an integer > 0");
+        }
+
+        Console.WriteLine();
+        Console.WriteLine($"{depositValue} x {depositAmt} to be deposited");
+
+        bool result = this.atm.Deposit(depositValue, depositAmt);
+
+        if (!result)
+        {
+            Console.WriteLine("\r\nSomething went wrong with your request.\r\n");
+
+            return;
+        }
+
+        Console.WriteLine("\r\nDeposit Successful!");
     }
 }

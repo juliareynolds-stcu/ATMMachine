@@ -3,6 +3,7 @@
 public class ATMCLI
 {
     public static event Action? WithdrawSelected;
+    public static event Action? DepositSelected;
     public static event Action? ViewCurrentStateSelected;
 
     public static void Main(string[] args)
@@ -19,7 +20,8 @@ public class ATMCLI
             Console.WriteLine("What would you like to do?");
             Console.WriteLine("1) View the current state of the ATM");
             Console.WriteLine("2) Make a withdrawl");
-            Console.WriteLine("3) Exit");
+            Console.WriteLine("3) Make a deposit");
+            Console.WriteLine("Q) Quit");
             Console.Write(">  ");
 
             switch (Console.ReadLine())
@@ -30,8 +32,13 @@ public class ATMCLI
                 case "2" or "2)" or "2.":
                     WithdrawSelected?.Invoke();
                     break;
-                case "3" or "3)" or "3." or "Q" or "Q." or "q" or "q."
-                or "end" or "End" or "exit" or "Exit" or "quit" or "Quit":
+                case "3" or "3)" or "3.":
+                    DepositSelected?.Invoke();
+                    break;
+                case "Q)" or "Q" or "Q." or "q" or "q." or "q)"
+                or "end" or "End" or "END"
+                or "exit" or "Exit" or "EXIT"
+                or "quit" or "Quit" or "QUIT":
                     repeat = false;
                     break;
                 default:

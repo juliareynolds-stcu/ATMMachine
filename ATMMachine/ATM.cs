@@ -208,4 +208,32 @@ public class ATM
 
         return result;
     }
+
+
+    /// <summary>
+    /// Deposits quantity of the specified value into the ATM if possible.
+    /// </summary>
+    /// <param name="value">The value of the bill/coin</param>
+    /// <param name="quantity">The number of that value to deposit</param>
+    /// <returns>true on success, false on failure</returns>
+    public bool Deposit(int value, int quantity)
+    {
+        if (value < 0 || quantity < 0)
+        {
+            return false;
+        }
+
+        if (this.availableCurrency.TryGetValue(value, out var currQuantity))
+        {
+            var total = currQuantity + quantity; // if this goes over int.MaxValue, it should become negative?
+
+            if (total > 0)
+            {
+                this.availableCurrency[value] = currQuantity + quantity;
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

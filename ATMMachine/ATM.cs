@@ -9,15 +9,15 @@ public class ATM
 {
     /// <summary>
     /// The available currency values and amount currently in the ATM.
-    /// int value, int amtAvailable
+    /// double value, int amtAvailable
     /// </summary>
-    private Dictionary<int, int> availableCurrency;
+    private Dictionary<double, int> availableCurrency;
 
     /// <summary>
     /// The currency values and types of currency allowed in the ATM.
-    /// int value, CurrencyType typeOfCurrency
+    /// double value, CurrencyType typeOfCurrency
     /// </summary>
-    private Dictionary<int, CurrencyType> typeOfCurrency;
+    private Dictionary<double, CurrencyType> typeOfCurrency;
 
     /// <summary>
     /// Types of currency.
@@ -69,42 +69,48 @@ public class ATM
     /// </summary>
     private void InitATMCurency()
     {
-        this.typeOfCurrency = new Dictionary<int, CurrencyType>();
-        this.availableCurrency = new Dictionary<int, int>();
-
-        this.typeOfCurrency[500] = CurrencyType.BILL;
-        this.availableCurrency[500] = 2;
-
-        this.typeOfCurrency[200] = CurrencyType.BILL;
-        this.availableCurrency[200] = 3;
+        this.typeOfCurrency = new Dictionary<double, CurrencyType>();
+        this.availableCurrency = new Dictionary<double, int>();
 
         this.typeOfCurrency[100] = CurrencyType.BILL;
-        this.availableCurrency[100] = 5;
+        this.availableCurrency[100] = 10;
 
         this.typeOfCurrency[50] = CurrencyType.BILL;
-        this.availableCurrency[50] = 12;
+        this.availableCurrency[50] = 20;
 
         this.typeOfCurrency[20] = CurrencyType.BILL;
-        this.availableCurrency[20] = 20;
+        this.availableCurrency[20] = 50;
 
         this.typeOfCurrency[10] = CurrencyType.BILL;
-        this.availableCurrency[10] = 50;
+        this.availableCurrency[10] = 100;
 
         this.typeOfCurrency[5] = CurrencyType.BILL;
-        this.availableCurrency[5] = 100;
+        this.availableCurrency[5] = 200;
 
-        this.typeOfCurrency[2] = CurrencyType.COIN;
-        this.availableCurrency[2] = 250;
+        this.typeOfCurrency[2] = CurrencyType.BILL;
+        this.availableCurrency[2] = 500;
 
-        this.typeOfCurrency[1] = CurrencyType.COIN;
-        this.availableCurrency[1] = 500;
+        this.typeOfCurrency[1] = CurrencyType.BILL;
+        this.availableCurrency[1] = 1000;
+
+        this.typeOfCurrency[0.25] = CurrencyType.COIN;
+        this.availableCurrency[0.25] = 400;
+
+        this.typeOfCurrency[0.10] = CurrencyType.COIN;
+        this.availableCurrency[0.10] = 100;
+
+        this.typeOfCurrency[0.05] = CurrencyType.COIN;
+        this.availableCurrency[0.05] = 200;
+
+        this.typeOfCurrency[0.01] = CurrencyType.COIN;
+        this.availableCurrency[0.01] = 1000;
     }
 
     /// <summary>
     /// Returns the current state of the ATM - the number of each value of currency currently in the ATM.
     /// </summary>
     /// <returns>Available currency in the form of a dictionary</returns>
-    public Dictionary<int, int> GetCurrentState()
+    public Dictionary<double, int> GetCurrentState()
     {
         return new(this.availableCurrency);
     }
@@ -114,7 +120,7 @@ public class ATM
     /// </summary>
     /// <param name="currencyValue">The value of the bill/coin</param>
     /// <returns>string representing the type of currency. "none" if it doesn't exist</returns>
-    public string? GetCurrencyType(int currencyValue)
+    public string? GetCurrencyType(double currencyValue)
     {
         if (!this.typeOfCurrency.TryGetValue(currencyValue, out CurrencyType result))
         {
@@ -136,7 +142,7 @@ public class ATM
     /// </summary>
     /// <param name="currencyValue">The value of the bill/coin</param>
     /// <returns>The number of that bill/coin in the ATM</returns>
-    public int GetQuantityAvailable(int currencyValue)
+    public int GetQuantityAvailable(double currencyValue)
     {
         var result = -1;
 
@@ -157,9 +163,9 @@ public class ATM
     /// Returns the total $ amount available for withdrawl
     /// </summary>
     /// <returns>int total $ in the atm</returns>
-    public int GetTotalAvailable()
+    public double GetTotalAvailable()
     {
-        var result = 0;
+        var result = 0.0;
 
         foreach (var value in this.availableCurrency.Keys)
         {
@@ -168,7 +174,7 @@ public class ATM
 
         if (result < 0)
         {
-            return int.MaxValue;
+            return double.MaxValue;
         }
 
         return result;
@@ -182,26 +188,26 @@ public class ATM
     /// A dictionary with the value of the currency and the associated amount
     /// or null if there's not enough in the ATM to return the requested quantity
     /// </returns>
-    public Dictionary<int, int>? Withdraw(int quantity)
+    public Dictionary<double, int>? Withdraw(double quantity)
     {
         // sort available currency values from low to high
-        List<int> currencyValues = new(this.availableCurrency.Keys);
+        List<double> currencyValues = new(this.availableCurrency.Keys);
 
         currencyValues.Sort();
 
         // work from largest to smallest, adding to result until = quantity
-        var remainder = quantity;
-        Dictionary<int, int> remainingCurrency = GetCurrentState();
-        Dictionary<int, int> result = new();
+        decimal remainder = (decimal) quantity;
+        Dictionary<double, int> remainingCurrency = GetCurrentState();
+        Dictionary<double, int> result = new();
 
         for (int currencyIdx = currencyValues.Count - 1; currencyIdx >= 0; currencyIdx--)
         {
             var value = currencyValues[currencyIdx];
             var totalGiven = 0;
 
-            while (value <= remainder && remainingCurrency[value] > 0)
+            while ((decimal) value <= remainder && remainingCurrency[value] > 0)
             {
-                remainder -= value;
+                remainder -= (decimal) value;
                 totalGiven += 1;
 
                 remainingCurrency[value] -= 1;
@@ -232,7 +238,7 @@ public class ATM
     /// <param name="value">The value of the bill/coin</param>
     /// <param name="quantity">The number of that value to deposit</param>
     /// <returns>true on success, false on failure</returns>
-    public bool Deposit(int value, int quantity)
+    public bool Deposit(double value, int quantity)
     {
         if (value < 0 || quantity < 0)
         {
@@ -241,11 +247,12 @@ public class ATM
 
         if (this.availableCurrency.TryGetValue(value, out var currQuantity))
         {
-            var total = currQuantity + quantity; // if this goes over int.MaxValue, it should become negative?
+            var total = currQuantity + quantity; // if this goes over MaxValue, it should become negative
 
             if (total > 0)
             {
                 this.availableCurrency[value] = currQuantity + quantity;
+
                 return true;
             }
         }

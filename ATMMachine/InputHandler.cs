@@ -64,7 +64,7 @@ internal class InputHandler
     /// Takes a dictionary (int value, int quantity) of currency and prints to the console
     /// </summary>
     /// <param name="currency">the dictionary to print</param>
-    /// <returns>int total currency represented in the dictionary</returns>
+    /// <returns>total currency represented in the dictionary</returns>
     private int PrintCurrency(Dictionary<int, int> currency)
     {
         Console.WriteLine();
@@ -255,7 +255,7 @@ internal class InputHandler
 
         if (successful.Count is 0)
         {
-            Console.WriteLine("Nothing was deposited successfully.");
+            Console.WriteLine("Nothing was deposited successfully.\r\n");
 
             return;
         }

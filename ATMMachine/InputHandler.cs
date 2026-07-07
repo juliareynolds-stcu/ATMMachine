@@ -32,18 +32,18 @@ internal class InputHandler
         Console.WriteLine("How much would you like to withdraw?");
         Console.Write(">  ");
 
-        int withdrawlAmt = -1;
+        var withdrawlAmt = -1.0;
 
         try
         {
-            withdrawlAmt = int.Parse(Console.ReadLine());
+            withdrawlAmt = double.Parse(Console.ReadLine());
         }
         catch
         {
-            Console.WriteLine("Invalid input. Please enter an integer > 0");
+            Console.WriteLine("Invalid input. Please enter a number > 0");
         }
 
-        Dictionary<int, int>? result = this.atm.Withdraw(withdrawlAmt);
+        Dictionary<double, int>? result = this.atm.Withdraw(withdrawlAmt);
 
         if (result is null)
         {
@@ -57,7 +57,7 @@ internal class InputHandler
 
         var total = PrintCurrency(result);
 
-        Console.WriteLine($"Total:  {total}\r\n");
+        Console.WriteLine($"Total:  ${total}\r\n");
     }
 
     /// <summary>
@@ -65,11 +65,11 @@ internal class InputHandler
     /// </summary>
     /// <param name="currency">the dictionary to print</param>
     /// <returns>total currency represented in the dictionary</returns>
-    private int PrintCurrency(Dictionary<int, int> currency)
+    private double PrintCurrency(Dictionary<double, int> currency)
     {
         Console.WriteLine();
         
-        var total = 0;
+        var total = 0.0;
 
         foreach (var value in currency.Keys)
         {
@@ -82,7 +82,7 @@ internal class InputHandler
 
         Console.WriteLine();
 
-        return total;
+        return Math.Round(total, 2);
     }
 
     /// <summary>
@@ -95,7 +95,7 @@ internal class InputHandler
         Console.WriteLine("| Value | Type | quantity of units |");
         Console.WriteLine("|-------|------|-------------------|");
 
-        var total = 0;
+        var total = 0.0;
         var currentState = atm.GetCurrentState();
 
         foreach (var value in currentState.Keys)
@@ -106,7 +106,7 @@ internal class InputHandler
             Console.WriteLine($"| {value}\t| {atm.GetCurrencyType(value)} | {quantity}\t           |");
         }
 
-        Console.WriteLine($"\r\nMax Withdrawl Amount:  {total}\r\n");
+        Console.WriteLine($"\r\nMax Withdrawl Amount:  ${total}\r\n");
     }
 
     /// <summary>
@@ -115,8 +115,8 @@ internal class InputHandler
     /// </summary>
     private void DepositHandled()
     {
-        Dictionary<int, int> depositRequest = new(); // int bill/coin value, int quantity
-        List<int> cantDeposit = new();
+        Dictionary<double, int> depositRequest = new(); // double bill/coin value, int quantity
+        List<double> cantDeposit = new();
         string? userInput;
         string[]? valuesToDeposit;
 
@@ -143,7 +143,7 @@ internal class InputHandler
 
                 foreach (var value in valuesToDeposit)
                 {
-                    var currencyValue = int.Parse(value);
+                    var currencyValue = double.Parse(value);
 
                     if (atm.GetCurrencyType(currencyValue) is null)
                     {
@@ -159,7 +159,7 @@ internal class InputHandler
             }
             catch
             {
-                Console.WriteLine("\r\nInvalid input. Please enter a list of integers only");
+                Console.WriteLine("\r\nInvalid input. Please enter a list of valid currency values only (1 for $1 bill, 0.25 for 25 cent coin).");
             }
         }
 
@@ -236,7 +236,7 @@ internal class InputHandler
                 return;
         }
 
-        Dictionary<int, int> successful = new();
+        Dictionary<double, int> successful = new();
 
         foreach(var value in depositRequest.Keys)
         {

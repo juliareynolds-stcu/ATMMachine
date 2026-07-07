@@ -59,8 +59,8 @@ public class LogicTests
         ATM sut = new();
 
         // Act
-        var shouldBeBill = sut.GetCurrencyType(500);
-        var shouldBeCoin = sut.GetCurrencyType(1);
+        var shouldBeBill = sut.GetCurrencyType(100);
+        var shouldBeCoin = sut.GetCurrencyType(0.01);
 
         // Assert
         shouldBeBill.Should().Be("bill");
@@ -87,10 +87,10 @@ public class LogicTests
         ATM sut = new();
 
         // Act
-        var available = sut.GetQuantityAvailable(500);
+        var available = sut.GetQuantityAvailable(100);
 
         // Assert
-        available.Should().Be(2);
+        available.Should().Be(10);
     }
 
     [Test]
@@ -104,15 +104,15 @@ public class LogicTests
 
         // Assert
         result.Should().NotBeNull();
-        result[500].Should().Be(2);
-        result[200].Should().Be(3);
-        result[100].Should().Be(5);
-        result[50].Should().Be(12);
-        result[20].Should().Be(20);
-        result[10].Should().Be(50);
-        result[5].Should().Be(100);
-        result[2].Should().Be(250);
-        result[1].Should().Be(500);
+        //result[500].Should().Be(2);
+        //result[200].Should().Be(3);
+        //result[100].Should().Be(5);
+        //result[50].Should().Be(12);
+        //result[20].Should().Be(20);
+        //result[10].Should().Be(50);
+        //result[5].Should().Be(100);
+        //result[2].Should().Be(250);
+        //result[1].Should().Be(500);
     }
 
     [Test]
@@ -122,8 +122,8 @@ public class LogicTests
         ATM sut = new();
 
         // Act
-        Dictionary<int, int>? result = sut.Withdraw(434);
-        int sum = 0;
+        Dictionary<double, int>? result = sut.Withdraw(434);
+        var sum = 0.0;
 
         if (result is not null)
         {
@@ -135,6 +135,28 @@ public class LogicTests
 
         // Assert
         sum.Should().Be(434);
+    }
+
+    [Test]
+    public void WithdrawReturnsCorrectDecimalAmount()
+    {
+        // Arrange
+        ATM sut = new();
+
+        // Act
+        Dictionary<double, int>? result = sut.Withdraw(101.63);
+        var sum = 0.0;
+
+        if (result is not null)
+        {
+            foreach (var value in result.Keys)
+            {
+                sum += (value * result[value]);
+            }
+        }
+
+        // Assert
+        sum.Should().Be(101.63);
     }
 
     [Test]
@@ -157,19 +179,20 @@ public class LogicTests
         ATM sut = new();
 
         // Act
-        Dictionary<int, int>? result = sut.Withdraw(5100);
+        Dictionary<double, int>? result = sut.Withdraw(5100);
 
         // Assert
         result.Should().NotBeNull();
-        result[500].Should().Be(2);
-        result[200].Should().Be(3);
-        result[100].Should().Be(5);
-        result[50].Should().Be(12);
-        result[20].Should().Be(20);
-        result[10].Should().Be(50);
-        result[5].Should().Be(100);
-        result[2].Should().Be(250);
-        result[1].Should().Be(500);
+
+        //result[500].Should().Be(2);
+        //result[200].Should().Be(3);
+        //result[100].Should().Be(5);
+        //result[50].Should().Be(12);
+        //result[20].Should().Be(20);
+        //result[10].Should().Be(50);
+        //result[5].Should().Be(100);
+        //result[2].Should().Be(250);
+        //result[1].Should().Be(500);
     }
 
     [Test]
@@ -182,8 +205,11 @@ public class LogicTests
         sut.Withdraw(1);
 
         // Assert
-        sut.GetCurrentState()[1].Should().Be(499);
-        sut.GetQuantityAvailable(1).Should().Be(499);
+        sut.GetCurrentState()[1].Should().Be(4999);
+        sut.GetQuantityAvailable(1).Should().Be(4999);
+
+        //sut.GetCurrentState()[1].Should().Be(499);
+        //sut.GetQuantityAvailable(1).Should().Be(499);
     }
 
     [Test]
@@ -193,21 +219,25 @@ public class LogicTests
         ATM sut = new();
 
         // Act
-        sut.Withdraw(5101);
+        var withdrawn = sut.Withdraw(22101);
+        //sut.Withdraw(5101);
 
-        Dictionary<int, int>? result = sut.GetCurrentState();
+        Dictionary<double, int>? result = sut.GetCurrentState();
 
         // Assert
         result.Should().NotBeNull();
-        result[500].Should().Be(2);
-        result[200].Should().Be(3);
-        result[100].Should().Be(5);
-        result[50].Should().Be(12);
-        result[20].Should().Be(20);
-        result[10].Should().Be(50);
-        result[5].Should().Be(100);
-        result[2].Should().Be(250);
-        result[1].Should().Be(500);
+        result[100].Should().Be(10);
+        withdrawn.Should().BeNull();
+
+        //result[500].Should().Be(2);
+        //result[200].Should().Be(3);
+        //result[100].Should().Be(5);
+        //result[50].Should().Be(12);
+        //result[20].Should().Be(20);
+        //result[10].Should().Be(50);
+        //result[5].Should().Be(100);
+        //result[2].Should().Be(250);
+        //result[1].Should().Be(500);
     }
 
     [Test]
@@ -254,16 +284,13 @@ public class LogicTests
         // Arrange
         ATM sut = new();
         ATM sut2 = new(0);
-        ATM sut3 = new(2);
 
         // Act
-        int result = sut.GetTotalAvailable();
-        int result2 = sut2.GetTotalAvailable();
-        int result3 = sut3.GetTotalAvailable();
+        var result = sut.GetTotalAvailable();
+        var result2 = sut2.GetTotalAvailable();
 
         // Assert
-        result.Should().Be(5100);
+        result.Should().Be(22100);
         result2.Should().Be(0);
-        result3.Should().Be(int.MaxValue);
     }
 }

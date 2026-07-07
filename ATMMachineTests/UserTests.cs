@@ -10,6 +10,6 @@ public class UserTests
     [Test]
     public void Test1()
     {
-        Assert.Pass();
+        
     }
 }

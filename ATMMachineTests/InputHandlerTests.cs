@@ -10,6 +10,6 @@ public class InputHandlerTests
     [Test]
     public void Test1()
     {
-        Assert.Pass();
+       
     }
 }

@@ -40,7 +40,7 @@ public class LogicTests
     }
 
     [Test]
-    public void ReturnsNoneWhenGettingInvalidCurrency()
+    public void ReturnsNullWhenGettingInvalidCurrency()
     {
         // Arrange
         ATM sut = new();
@@ -49,7 +49,7 @@ public class LogicTests
         var currencyType = sut.GetCurrencyType(-1);
 
         // Assert
-        currencyType.Should().Be("none");
+        currencyType.Should().BeNull();
     }
 
     [Test]
@@ -74,7 +74,7 @@ public class LogicTests
         ATM sut = new();
 
         // Act
-        var available = sut.GetAvailable(-5);
+        var available = sut.GetQuantityAvailable(-5);
 
         // Assert
         available.Should().BeLessThan(0);
@@ -87,7 +87,7 @@ public class LogicTests
         ATM sut = new();
 
         // Act
-        var available = sut.GetAvailable(500);
+        var available = sut.GetQuantityAvailable(500);
 
         // Assert
         available.Should().Be(2);
@@ -183,7 +183,7 @@ public class LogicTests
 
         // Assert
         sut.GetCurrentState()[1].Should().Be(499);
-        sut.GetAvailable(1).Should().Be(499);
+        sut.GetQuantityAvailable(1).Should().Be(499);
     }
 
     [Test]
@@ -221,7 +221,7 @@ public class LogicTests
 
         // Assert
         result.Should().BeTrue();
-        sut.GetAvailable(1).Should().Be(1);
+        sut.GetQuantityAvailable(1).Should().Be(1);
     }
 
     [Test]
@@ -245,6 +245,25 @@ public class LogicTests
         result3.Should().BeFalse();
         result4.Should().BeFalse();
 
-        sut.GetAvailable(1).Should().Be(1);
+        sut.GetQuantityAvailable(1).Should().Be(1);
+    }
+
+    [Test]
+    public void AccuratelyReturnsTotalValueInATM()
+    {
+        // Arrange
+        ATM sut = new();
+        ATM sut2 = new(0);
+        ATM sut3 = new(2);
+
+        // Act
+        int result = sut.GetTotalAvailable();
+        int result2 = sut2.GetTotalAvailable();
+        int result3 = sut3.GetTotalAvailable();
+
+        // Assert
+        result.Should().Be(5100);
+        result2.Should().Be(0);
+        result3.Should().Be(int.MaxValue);
     }
 }

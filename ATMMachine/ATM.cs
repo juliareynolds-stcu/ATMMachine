@@ -114,19 +114,13 @@ public class ATM
     /// </summary>
     /// <param name="currencyValue">The value of the bill/coin</param>
     /// <returns>string representing the type of currency. "none" if it doesn't exist</returns>
-    public string GetCurrencyType(int currencyValue)
+    public string? GetCurrencyType(int currencyValue)
     {
-        CurrencyType result;
-
-        try
+        if (!this.typeOfCurrency.TryGetValue(currencyValue, out CurrencyType result))
         {
-            result = this.typeOfCurrency[currencyValue];
+            return null;
         }
-        catch
-        {
-            return "none";
-        }
-
+        
         if (result == CurrencyType.BILL)
         {
             return "bill";
@@ -142,7 +136,7 @@ public class ATM
     /// </summary>
     /// <param name="currencyValue">The value of the bill/coin</param>
     /// <returns>The number of that bill/coin in the ATM</returns>
-    public int GetAvailable(int currencyValue)
+    public int GetQuantityAvailable(int currencyValue)
     {
         var result = -1;
 
@@ -153,6 +147,28 @@ public class ATM
         catch
         {
             return result;
+        }
+
+        return result;
+    }
+
+
+    /// <summary>
+    /// Returns the total $ amount available for withdrawl
+    /// </summary>
+    /// <returns>int total $ in the atm</returns>
+    public int GetTotalAvailable()
+    {
+        var result = 0;
+
+        foreach (var value in this.availableCurrency.Keys)
+        {
+            result += (value * this.availableCurrency[value]);
+        }
+
+        if (result < 0)
+        {
+            return int.MaxValue;
         }
 
         return result;

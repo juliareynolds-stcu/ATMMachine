@@ -34,13 +34,28 @@ internal class InputHandler
 
         var withdrawlAmt = -1.0;
 
-        try
+        while(true)
         {
-            withdrawlAmt = double.Parse(Console.ReadLine());
-        }
-        catch
-        {
-            Console.WriteLine("Invalid input. Please enter a number > 0");
+            try
+            {
+                var userInput = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(userInput))
+                {
+                    throw new ArgumentException();
+                }
+
+                userInput = Regex.Replace(userInput, "[^0-9.]", "");
+
+                withdrawlAmt = double.Parse(userInput);
+
+                break;
+            }
+            catch
+            {
+                Console.WriteLine("Invalid input. Please enter a number > 0");
+                Console.Write(">  ");
+            }
         }
 
         Dictionary<double, int>? result = this.atm.Withdraw(withdrawlAmt);

@@ -179,20 +179,13 @@ public class LogicTests
         ATM sut = new();
 
         // Act
-        Dictionary<double, int>? result = sut.Withdraw(5100);
+        Dictionary<double, int>? result = sut.Withdraw(1100);
 
         // Assert
         result.Should().NotBeNull();
 
-        //result[500].Should().Be(2);
-        //result[200].Should().Be(3);
-        //result[100].Should().Be(5);
-        //result[50].Should().Be(12);
-        //result[20].Should().Be(20);
-        //result[10].Should().Be(50);
-        //result[5].Should().Be(100);
-        //result[2].Should().Be(250);
-        //result[1].Should().Be(500);
+        result[100].Should().Be(10);
+        result[50].Should().Be(2);
     }
 
     [Test]
@@ -205,8 +198,8 @@ public class LogicTests
         sut.Withdraw(1);
 
         // Assert
-        sut.GetCurrentState()[1].Should().Be(4999);
-        sut.GetQuantityAvailable(1).Should().Be(4999);
+        sut.GetCurrentState()[1].Should().Be(999);
+        sut.GetQuantityAvailable(1).Should().Be(999);
 
         //sut.GetCurrentState()[1].Should().Be(499);
         //sut.GetQuantityAvailable(1).Should().Be(499);
@@ -219,7 +212,7 @@ public class LogicTests
         ATM sut = new();
 
         // Act
-        var withdrawn = sut.Withdraw(22101);
+        var withdrawn = sut.Withdraw(9999999);
         //sut.Withdraw(5101);
 
         Dictionary<double, int>? result = sut.GetCurrentState();
@@ -228,16 +221,6 @@ public class LogicTests
         result.Should().NotBeNull();
         result[100].Should().Be(10);
         withdrawn.Should().BeNull();
-
-        //result[500].Should().Be(2);
-        //result[200].Should().Be(3);
-        //result[100].Should().Be(5);
-        //result[50].Should().Be(12);
-        //result[20].Should().Be(20);
-        //result[10].Should().Be(50);
-        //result[5].Should().Be(100);
-        //result[2].Should().Be(250);
-        //result[1].Should().Be(500);
     }
 
     [Test]
@@ -290,7 +273,7 @@ public class LogicTests
         var result2 = sut2.GetTotalAvailable();
 
         // Assert
-        result.Should().Be(22100);
+        result.Should().Be(7130);
         result2.Should().Be(0);
     }
 }

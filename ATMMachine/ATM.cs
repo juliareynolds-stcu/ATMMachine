@@ -78,29 +78,32 @@ public class ATM
         this.typeOfCurrency[50] = CurrencyType.BILL;
         this.availableCurrency[50] = 20;
 
+        this.typeOfCurrency[20] = CurrencyType.BILL;
+        this.availableCurrency[20] = 50;
+
         this.typeOfCurrency[10] = CurrencyType.BILL;
         this.availableCurrency[10] = 100;
 
         this.typeOfCurrency[5] = CurrencyType.BILL;
-        this.availableCurrency[5] = 1000;
+        this.availableCurrency[5] = 200;
 
         this.typeOfCurrency[2] = CurrencyType.BILL;
-        this.availableCurrency[2] = 2500;
+        this.availableCurrency[2] = 500;
 
         this.typeOfCurrency[1] = CurrencyType.BILL;
-        this.availableCurrency[1] = 5000;
+        this.availableCurrency[1] = 1000;
 
         this.typeOfCurrency[0.25] = CurrencyType.COIN;
-        this.availableCurrency[0.25] = 10000;
+        this.availableCurrency[0.25] = 400;
 
         this.typeOfCurrency[0.10] = CurrencyType.COIN;
-        this.availableCurrency[0.10] = 10000;
+        this.availableCurrency[0.10] = 100;
 
         this.typeOfCurrency[0.05] = CurrencyType.COIN;
-        this.availableCurrency[0.05] = 10000;
+        this.availableCurrency[0.05] = 200;
 
         this.typeOfCurrency[0.01] = CurrencyType.COIN;
-        this.availableCurrency[0.01] = 10000;
+        this.availableCurrency[0.01] = 1000;
     }
 
     /// <summary>

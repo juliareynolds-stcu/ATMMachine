@@ -119,7 +119,7 @@ public class ATM
     /// Returns if the currency value is a bill or coin.
     /// </summary>
     /// <param name="currencyValue">The value of the bill/coin</param>
-    /// <returns>string representing the type of currency. "none" if it doesn't exist</returns>
+    /// <returns>string representing the type of currency, null if it doesn't exist</returns>
     public string? GetCurrencyType(double currencyValue)
     {
         if (!this.typeOfCurrency.TryGetValue(currencyValue, out CurrencyType result))
@@ -183,12 +183,12 @@ public class ATM
     /// <summary>
     /// Determines the amount of each value of currency to withdraw.
     /// </summary>
-    /// <param name="quantity">Desired total to withdraw</param>
+    /// <param name="amount">Desired total to withdraw</param>
     /// <returns>
     /// A dictionary with the value of the currency and the associated amount
     /// or null if there's not enough in the ATM to return the requested quantity
     /// </returns>
-    public Dictionary<double, int>? Withdraw(double quantity)
+    public Dictionary<double, int>? Withdraw(double amount)
     {
         // sort available currency values from low to high
         List<double> currencyValues = new(this.availableCurrency.Keys);
@@ -196,7 +196,7 @@ public class ATM
         currencyValues.Sort();
 
         // work from largest to smallest, adding to result until = quantity
-        decimal remainder = (decimal) quantity;
+        var remainder = Math.Round(amount, 2);
         Dictionary<double, int> remainingCurrency = GetCurrentState();
         Dictionary<double, int> result = new();
 
@@ -205,9 +205,9 @@ public class ATM
             var value = currencyValues[currencyIdx];
             var totalGiven = 0;
 
-            while ((decimal) value <= remainder && remainingCurrency[value] > 0)
+            while (value <= remainder && remainingCurrency[value] > 0)
             {
-                remainder -= (decimal) value;
+                remainder = Math.Round((remainder - value), 2);
                 totalGiven += 1;
 
                 remainingCurrency[value] -= 1;
@@ -229,6 +229,38 @@ public class ATM
         this.availableCurrency = remainingCurrency;
 
         return result;
+    }
+
+    /// <summary>
+    /// Withdraws a specified quantity of the desired value bill/coin from the ATM
+    /// </summary>
+    /// <param name="value">The value of the bill/coin to withdraw</param>
+    /// <param name="quantity">The quantity of the bill/coin to withdraw</param>
+    /// <returns>dictionary with the value and quantity of currency, null on failure</returns>
+    public Dictionary<double, int>? Withdraw(double value, int quantity)
+    {
+        if ((value < 0) || (quantity < 0))
+        {
+            return null;
+        }
+
+        var quantityAvailable = 0;
+
+        if (!this.availableCurrency.TryGetValue(value, out quantityAvailable))
+        {
+            return null;
+        }
+
+        var remainingQuantity = quantityAvailable - quantity;
+
+        if (remainingQuantity < 0)
+        {
+            return null;
+        }
+
+        this.availableCurrency[value] = remainingQuantity;
+
+        return new Dictionary<double, int>() { [value] = quantity };
     }
 
 

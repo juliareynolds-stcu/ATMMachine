@@ -276,4 +276,60 @@ public class LogicTests
         result.Should().Be(7130);
         result2.Should().Be(0);
     }
+
+    [Test]
+    public void WithdrawSpecifiedBill()
+    {
+        // Arrange
+        ATM sut = new();
+
+        // Act
+        Dictionary<double, int>? result = sut.Withdraw(1, 5);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Count.Should().Be(1);
+        result.TryGetValue(1, out var quantity).Should().BeTrue();
+        quantity.Should().Be(5);
+        sut.GetQuantityAvailable(1).Should().Be(995);
+    }
+
+    [Test]
+    public void WithdrawBillDoesntWithdrawPastAvailableQuantity()
+    {
+        // Arrange
+        ATM sut = new(0);
+        ATM sut2 = new(0);
+
+        sut2.Deposit(1, 4);
+
+        // Act
+        Dictionary<double, int>? result = sut.Withdraw(1, 1);
+        Dictionary<double, int>? result2 = sut2.Withdraw(1, 5);
+
+        // Assert
+        result.Should().BeNull();
+        sut.GetCurrentState()[1].Should().Be(0);
+
+        result2.Should().BeNull();
+        sut2.GetCurrentState()[1].Should().Be(4);
+    }
+
+    [Test]
+    public void WithdrawBillIgnoresInvalidInput()
+    {
+        // Arrange
+        ATM sut = new(0);
+
+        sut.Deposit(1, 5);
+
+        // Act
+        Dictionary<double, int>? result = sut.Withdraw(-1, 1);
+        Dictionary<double, int>? result2 = sut.Withdraw(1, -1);
+
+        // Assert
+        result.Should().BeNull();
+        result2.Should().BeNull();
+        sut.GetQuantityAvailable(1).Should().Be(5);
+    }
 }

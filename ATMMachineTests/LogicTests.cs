@@ -326,10 +326,13 @@ public class LogicTests
         // Act
         Dictionary<double, int>? result = sut.Withdraw(-1, 1);
         Dictionary<double, int>? result2 = sut.Withdraw(1, -1);
+        Dictionary<double, int>? result3 = sut.Withdraw(3, 1);
 
         // Assert
         result.Should().BeNull();
         result2.Should().BeNull();
         sut.GetQuantityAvailable(1).Should().Be(5);
+
+        result3.Should().BeNull();
     }
 }

@@ -9,6 +9,7 @@ namespace ATMMachine;
 internal class InputHandler
 {
     ATM atm;
+    User user;
 
     /// <summary>
     /// Constructor
@@ -18,8 +19,11 @@ internal class InputHandler
         ATMCLI.WithdrawSelected += WithdrawHandled;
         ATMCLI.ViewCurrentStateSelected += ViewCurrentStateHandled;
         ATMCLI.DepositSelected += DepositHandled;
+        ATMCLI.ViewAccountBalanceSelected += ViewAccountBalanceHandled;
+        ATMCLI.ViewPocketContentsSelected += ViewPocketContentsHandled;
 
         this.atm = new();
+        this.user = new();
     }
     
     /// <summary>
@@ -30,6 +34,11 @@ internal class InputHandler
     {
         Console.WriteLine();
         Console.WriteLine("How much would you like to withdraw?");
+
+        var userBalance = this.user.GetCheckingBalance();
+        var atmBalance = this.atm.GetTotalAvailable();
+
+        Console.WriteLine($"${((userBalance < atmBalance) ? userBalance : atmBalance)} is available for withdrawl.");
         Console.Write(">  ");
 
         var withdrawlAmt = -1.0;
@@ -45,7 +54,7 @@ internal class InputHandler
                     throw new ArgumentException();
                 }
 
-                userInput = Regex.Replace(userInput, "[^0-9.]", "");
+                userInput = Regex.Replace(userInput, "[^0-9.-]", "");
 
                 withdrawlAmt = double.Parse(userInput);
 
@@ -58,6 +67,18 @@ internal class InputHandler
             }
         }
 
+        if (withdrawlAmt < 1)
+        {
+            Console.WriteLine("\r\nNothing to withdraw. Returning to menu.\r\n");
+            return;
+        }
+
+        if (userBalance < withdrawlAmt)
+        {
+            Console.WriteLine("\r\nInsufficient funds. Could not complete your withdrawl. \r\n");
+            return;
+        }
+
         Dictionary<double, int>? result = this.atm.Withdraw(withdrawlAmt);
 
         if (result is null)
@@ -68,10 +89,16 @@ internal class InputHandler
             return;
         }
 
-        Console.WriteLine("\r\nWithdraw Successful!");
+        foreach (var type in result)
+        {
+            this.user.PlaceInPocket(type.Key, type.Value);
+        }
 
         var total = PrintCurrency(result);
 
+        this.user.WithdrawFromChecking(total);
+
+        Console.WriteLine("Withdraw Successful!");
         Console.WriteLine($"Total:  ${total}\r\n");
     }
 
@@ -83,16 +110,31 @@ internal class InputHandler
     private double PrintCurrency(Dictionary<double, int> currency)
     {
         Console.WriteLine();
-        
+        Console.WriteLine("| Value | Type | Quantity of Units |");
+        Console.WriteLine("|-------|------|-------------------|");
+
         var total = 0.0;
+
+        // Another way to output the currency
+        //foreach (var value in currency.Keys)
+        //{
+        //    var quantity = currency[value];
+
+        //    Console.WriteLine($"{quantity} ${value} {atm.GetCurrencyType(value)}{((quantity > 1) ? "s" : "")}");
+            
+        //    total += (value * quantity);
+        //}
 
         foreach (var value in currency.Keys)
         {
             var quantity = currency[value];
 
-            Console.WriteLine($"{quantity} ${value} {atm.GetCurrencyType(value)}{((quantity > 1) ? "s" : "")}");
-            
-            total += (value * quantity);
+            if (quantity != 0)
+            {
+                total += Math.Round((value * quantity), 2);
+
+                Console.WriteLine($"| {value}\t| {atm.GetCurrencyType(value)} | {quantity}\t           |");
+            }
         }
 
         Console.WriteLine();
@@ -106,22 +148,9 @@ internal class InputHandler
     /// </summary>
     private void ViewCurrentStateHandled()
     {
-        Console.WriteLine();
-        Console.WriteLine("| Value | Type | quantity of units |");
-        Console.WriteLine("|-------|------|-------------------|");
+        var total = PrintCurrency(atm.GetCurrentState());
 
-        var total = 0.0;
-        var currentState = atm.GetCurrentState();
-
-        foreach (var value in currentState.Keys)
-        {
-            var quantity = currentState[value];
-            total += (value * quantity);
-
-            Console.WriteLine($"| {value}\t| {atm.GetCurrencyType(value)} | {quantity}\t           |");
-        }
-
-        Console.WriteLine($"\r\nMax Withdrawl Amount:  ${total}\r\n");
+        Console.WriteLine($"\r\nMax Withdrawl Amount:  ${total}\r\n\r\n");
     }
 
     /// <summary>
@@ -135,7 +164,9 @@ internal class InputHandler
         string? userInput;
         string[]? valuesToDeposit;
 
-        Console.WriteLine();
+        Console.WriteLine("\r\nYou have the following in your pocket:");
+
+        ViewPocketContentsHandled();
 
         Console.WriteLine("\r\nPlease enter the value of the bills/coins you would like to deposit separated by commas");
 
@@ -160,7 +191,7 @@ internal class InputHandler
                 {
                     var currencyValue = double.Parse(value);
 
-                    if (atm.GetCurrencyType(currencyValue) is null)
+                    if ((atm.GetCurrencyType(currencyValue) is null) || (user.GetQuantityInPocket(currencyValue) < 1))
                     {
                         cantDeposit.Add(currencyValue);
                     }
@@ -197,6 +228,9 @@ internal class InputHandler
 
         Console.WriteLine("\r\nPlease enter the quantity of each of the following that you would like to deposit or enter q to quit:");
 
+        var thereIsCashToDeposit = false;
+        List<double> insufficientFunds = new();
+
         foreach (var value in depositRequest.Keys)
         {
             var quantity = -1;
@@ -230,14 +264,43 @@ internal class InputHandler
                 }
             }
 
-            depositRequest[value] = quantity;
+            if (quantity > 0)
+            {
+                if ((user.GetQuantityInPocket(value) >= quantity))
+                {
+                    thereIsCashToDeposit = true;
+
+                    depositRequest[value] = quantity;
+                }
+                else
+                {
+                    insufficientFunds.Add(value);
+                }
+            }
         }
 
-        Console.WriteLine("\r\nYou requested to deposit the following:");
+        if (!thereIsCashToDeposit)
+        {
+            Console.WriteLine("\r\nCannot make deposit. Exiting to menu.\r\n");
+
+            return;
+        }
+
+        Console.WriteLine("\r\nThe following can be deposited:");
 
         var total = PrintCurrency(depositRequest);
 
         Console.WriteLine($"Total: ${total}");
+
+        if (insufficientFunds.Count > 0)
+        {
+            Console.WriteLine("\r\nYou do not have enough of the following in your pocket to deposit the requested quantity: ");
+
+            foreach (var value in insufficientFunds)
+            {
+                Console.WriteLine($"${value} {atm.GetCurrencyType(value)}s");
+            }
+        }
 
         Console.WriteLine("\r\nWould you like to procede with the deposit? (y/n)");
         Console.Write(">  ");
@@ -256,7 +319,7 @@ internal class InputHandler
         foreach(var value in depositRequest.Keys)
         {
             var quantity = depositRequest[value];
-            bool result = this.atm.Deposit(value, depositRequest[value]);
+            bool result = this.atm.Deposit(value, quantity);
 
             if (!result)
             {
@@ -264,6 +327,9 @@ internal class InputHandler
             }
             else
             {
+                this.user.RemoveFromPocket(value, quantity);
+                this.user.DepositIntoChecking(value, quantity);
+
                 successful[value] = quantity;
             }
         }
@@ -280,5 +346,27 @@ internal class InputHandler
         total = PrintCurrency(successful);
 
         Console.WriteLine($"\r\nThank you for your ${total} deposit\r\n");
+    }
+
+    /// <summary>
+    /// Triggered when user selects view account balance option from menu.
+    /// Handles printing the user's current balance.
+    /// </summary>
+    private void ViewAccountBalanceHandled()
+    {
+        Console.WriteLine("\r\nYour Accounts:");
+        Console.WriteLine($"  *  Checking - ${this.user.GetCheckingBalance()}\r\n");
+    }
+
+    /// <summary>
+    /// Triggered when user selects to view the contents of their pocket.
+    /// Handles printing the user's pocket cash.
+    /// </summary>
+    private void ViewPocketContentsHandled()
+    {
+        var total = PrintCurrency(this.user.GetPocketContents());
+
+        Console.WriteLine($"Total in cash: ${total}");
+        Console.WriteLine();
     }
 }

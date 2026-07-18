@@ -169,7 +169,7 @@ public class ATM
 
         foreach (var value in this.availableCurrency.Keys)
         {
-            result += (value * this.availableCurrency[value]);
+            result += Math.Round((value * this.availableCurrency[value]), 2);
         }
 
         if (result < 0)

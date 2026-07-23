@@ -1,9 +1,9 @@
 ﻿namespace ATMMachineTests;
 
 using AwesomeAssertions;
-using ATMMachine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using System.Runtime.InteropServices.Marshalling;
+using ATMMachine.Model;
 
 public class LogicTests
 {

@@ -1,6 +1,6 @@
 ﻿namespace ATMMachineTests;
 
-using ATMMachine;
+using ATMMachine.Model;
 using AwesomeAssertions;
 
 public class UserTests
@@ -10,14 +10,47 @@ public class UserTests
     [SetUp]
     public void Setup()
     {
-        this.user = new(0, new());
+        this.user = new(0, 0, null);
     }
 
     [Test]
     public void CreatesEmptyUser()
     {
         this.user.GetCheckingBalance().Should().Be(0);
+        this.user.HasChecking().Should().BeTrue();
+
+        this.user.GetSavingsBalance().Should().Be(0);
+        this.user.HasSavings().Should().BeTrue();
+
         this.user.GetPocketBalance().Should().Be(0);
+    }
+
+    [Test]
+    public void CreatesUserWithNoChecking()
+    {
+        var sut = new User(-1, 0, null);
+
+        sut.GetCheckingBalance().Should().Be(-1);
+        sut.HasChecking().Should().BeFalse();
+
+        sut.GetSavingsBalance().Should().Be(0);
+        sut.HasSavings().Should().BeTrue();
+
+        sut.GetPocketBalance().Should().Be(0);
+    }
+
+    [Test]
+    public void CreatesUserWithNoSavings()
+    {
+        var sut = new User(0, -1, null);
+
+        sut.GetCheckingBalance().Should().Be(0);
+        sut.HasChecking().Should().BeTrue();
+
+        sut.GetSavingsBalance().Should().Be(-1);
+        sut.HasSavings().Should().BeFalse();
+
+        sut.GetPocketBalance().Should().Be(0);
     }
 
     [TestCase(0)]

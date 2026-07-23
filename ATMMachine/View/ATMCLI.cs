@@ -1,9 +1,12 @@
-﻿namespace ATMMachine;
+﻿using ATMMachine.Controller;
+
+namespace ATMMachine.View;
 
 public class ATMCLI
 {
     public static event Action? WithdrawSelected;
     public static event Action? DepositSelected;
+    public static event Action? InternalTransferSelected;
     public static event Action? ViewCurrentStateSelected;
     public static event Action? ViewAccountBalanceSelected;
     public static event Action? ViewPocketContentsSelected;
@@ -23,8 +26,9 @@ public class ATMCLI
             Console.WriteLine("1) View the current state of the ATM");
             Console.WriteLine("2) Make a withdrawl");
             Console.WriteLine("3) Make a deposit");
-            Console.WriteLine("4) View my account balance");
-            Console.WriteLine("5) Check my pocket");
+            Console.WriteLine("4) View my account balances");
+            Console.WriteLine("5) Make an internal transfer");
+            Console.WriteLine("6) Check my pocket");
             Console.WriteLine("Q) Quit");
             Console.Write(">  ");
 
@@ -43,6 +47,9 @@ public class ATMCLI
                     ViewAccountBalanceSelected?.Invoke();
                     break;
                 case "5" or "5)" or "5.":
+                    InternalTransferSelected?.Invoke();
+                    break;
+                case "6" or "6)" or "6.":
                     ViewPocketContentsSelected?.Invoke();
                     break;
                 case "Q)" or "Q" or "Q." or "q" or "q." or "q)"

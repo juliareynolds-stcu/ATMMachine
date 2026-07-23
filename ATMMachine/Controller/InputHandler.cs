@@ -1,10 +1,17 @@
-﻿using System;
+﻿using ATMMachine.Model;
+using ATMMachine.View;
+using System;
 using System.Collections.Generic;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace ATMMachine;
+namespace ATMMachine.Controller;
+
+// TODO: Add savings account handling for withdrawl
+// TODO: Add savings account handling for deposit
+// TODO: Add internal account transfer ability
+// TODO: Move all writing to console operations to ATMCLI or a DisplayHandler class
 
 internal class InputHandler
 {
@@ -17,8 +24,9 @@ internal class InputHandler
     public InputHandler()
     {
         ATMCLI.WithdrawSelected += WithdrawHandled;
-        ATMCLI.ViewCurrentStateSelected += ViewCurrentStateHandled;
         ATMCLI.DepositSelected += DepositHandled;
+        ATMCLI.InternalTransferSelected += InternalTransferHandled;
+        ATMCLI.ViewCurrentStateSelected += ViewCurrentStateHandled;
         ATMCLI.ViewAccountBalanceSelected += ViewAccountBalanceHandled;
         ATMCLI.ViewPocketContentsSelected += ViewPocketContentsHandled;
 
@@ -100,7 +108,7 @@ internal class InputHandler
 
         Console.WriteLine("Withdraw Successful!");
         Console.WriteLine($"Total:  ${total}\r\n");
-    }
+    } // end if WithdrawHandled
 
     /// <summary>
     /// Takes a dictionary (int value, int quantity) of currency and prints to the console
@@ -346,6 +354,14 @@ internal class InputHandler
         total = PrintCurrency(successful);
 
         Console.WriteLine($"\r\nThank you for your ${total} deposit\r\n");
+    } // end of DepositHandled
+
+    /// <summary>
+    /// Handles transferring money from one of the user's accounts to another.
+    /// </summary>
+    private void InternalTransferHandled()
+    {
+        Console.WriteLine("\r\nFeatureComingSoon\r\n");
     }
 
     /// <summary>
@@ -354,8 +370,26 @@ internal class InputHandler
     /// </summary>
     private void ViewAccountBalanceHandled()
     {
-        Console.WriteLine("\r\nYour Accounts:");
-        Console.WriteLine($"  *  Checking - ${this.user.GetCheckingBalance()}\r\n");
+        if (!this.user.HasChecking() && !this.user.HasSavings())
+        {
+            Console.WriteLine("\r\nNo Accounts to Display");
+        }
+        else
+        {
+            Console.WriteLine("\r\nYour Accounts:");
+
+            if (this.user.HasChecking())
+            {
+                Console.WriteLine($"  *  Checking - ${this.user.GetCheckingBalance()}");
+            }
+
+            if (this.user.HasSavings())
+            {
+                Console.WriteLine($"  *  Savings  - ${this.user.GetSavingsBalance()}");
+            }
+        }
+
+        Console.WriteLine();
     }
 
     /// <summary>
